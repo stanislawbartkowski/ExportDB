@@ -95,6 +95,16 @@ exportlist() {
   done < $LIST
 }
 
+# compare number of records
+# $1: list of tables
+
+comparenumber() {
+  local -r LIST=$1
+  setjdbc com.export.db2.main.CompareNumber
+  ! $JAVACMD -l $LIST  && logfail "Failed, number of records do not match"
+  log "OK. Number of records matches"
+}
+
 # =============================
 # generate db2 load commands
 # =============================
@@ -234,6 +244,9 @@ printhelp() {
   echo " Create SQL IMPORT command file"
   echo " Example : run.sh createimport /tmp/listoftable /tmp/export /tmp/load.db2"
   echo ""
+  echo "action: comparenumber /file_of_tables/ "
+  echo " Compare number of records in source and dest"
+  echo " Example : run.sh comparenumber /tmp/listoftable "
 
 }
 
@@ -249,6 +262,7 @@ main() {
       exportlist) exportlist $@;;
       createload) createloadstatements load $@;;
       createimport) createloadstatements import $@;;
+      comparenumber) comparenumber $@;;
       *) printhelp; exit 10;;
   esac
 
